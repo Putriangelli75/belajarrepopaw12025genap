@@ -2,75 +2,57 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Lapangan;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\Lapangan;
 
 class LapanganController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     */
     public function index()
     {
-        return response()->json(
-            Lapangan::latest()->get()
-        );
+        return Lapangan::all();
     }
 
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
-        $request->validate([
-            'nama_lapangan' => 'required',
-            'jenis_olahraga' => 'required',
-            'lokasi' => 'required',
-            'harga_per_jam' => 'required|numeric'
-        ]);
-
-        $lapangan = Lapangan::create([
-            'nama_lapangan' => $request->nama_lapangan,
-            'jenis_olahraga' => $request->jenis_olahraga,
-            'lokasi' => $request->lokasi,
-            'harga_per_jam' => $request->harga_per_jam,
-            'status' => 'Aktif'
-        ]);
-
-        return response()->json([
-            'message' => 'Lapangan berhasil ditambahkan',
-            'data' => $lapangan
-        ]);
+        return Lapangan::create($request->all());
     }
-
-    public function show(string $id)
+    /**
+     * Display the specified resource.
+     */
+    public function show($id)
     {
-        return response()->json(
-            Lapangan::findOrFail($id)
-        );
+        return Lapangan::findOrFail($id);
     }
 
-    public function update(
-        Request $request,
-        string $id
-    )
-    {
-        $lapangan = Lapangan::findOrFail($id);
+    /**
+     * Update the specified resource in storage.
+     */
 
-        $lapangan->update([
-            'nama_lapangan' => $request->nama_lapangan,
-            'jenis_olahraga' => $request->jenis_olahraga,
-            'lokasi' => $request->lokasi,
-            'harga_per_jam' => $request->harga_per_jam,
-            'status' => $request->status
-        ]);
 
-        return response()->json([
-            'message' => 'Lapangan berhasil diupdate'
-        ]);
-    }
-
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy(string $id)
-    {
-        Lapangan::findOrFail($id)->delete();
+{
+    Lapangan::destroy($id);
 
-        return response()->json([
-            'message' => 'Lapangan berhasil dihapus'
-        ]);
-    }
+    return response()->json([
+        'message' => 'Data berhasil dihapus'
+    ]);
+}
+    public function update(Request $request, string $id)
+{
+    $lapangan = Lapangan::findOrFail($id);
+
+    $lapangan->update($request->all());
+
+    return response()->json($lapangan);
+}
 }

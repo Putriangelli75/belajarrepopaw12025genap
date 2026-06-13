@@ -3,25 +3,31 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\LapanganController;
-use App\Http\Controllers\Api\JadwalController;
+use App\Http\Controllers\Api\BookingController;
 
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class,'register']);
+Route::post('/login', [AuthController::class,'login']);
 
-Route::middleware('auth:sanctum')
-    ->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
 
-        Route::post(
-            '/logout',
-            [AuthController::class, 'logout']
-        );
+    Route::apiResource(
+        'lapangan',
+        LapanganController::class
+    );
 
-        Route::apiResource(
-            'lapangans',
-            LapanganController::class
-        );
-        Route::apiResource(
-            'jadwals',
-            JadwalController::class
-        );
-    });
+    Route::post(
+        '/booking',
+        [BookingController::class,'store']
+    );
+
+    Route::get(
+        '/riwayat-booking',
+        [BookingController::class,'riwayat']
+    );
+
+    Route::post(
+        '/upload-pembayaran/{id}',
+        [BookingController::class,'upload']
+    );
+
+});

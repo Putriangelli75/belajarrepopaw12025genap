@@ -2,17 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Booking extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'user_id',
         'lapangan_id',
-        'tanggal_booking',
+        'tanggal',
         'jam_mulai',
         'jam_selesai',
-        'durasi',
         'total_harga',
         'status'
     ];
@@ -29,6 +31,6 @@ class Booking extends Model
 
     public function pembayaran()
     {
-        return $this->hasOne(Pembayaran::class,'booking_id');
+        return $this->hasOne(Pembayaran::class);
     }
 }
