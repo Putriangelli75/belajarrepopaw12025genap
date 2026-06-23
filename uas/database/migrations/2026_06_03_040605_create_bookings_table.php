@@ -27,7 +27,7 @@ return new class extends Migration
             $table->enum('status', [
                 'pending',
                 'menunggu_verifikasi',
-                'lunas',
+                'disetujui',
                 'ditolak'
             ])->default('pending');
 

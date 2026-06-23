@@ -3,56 +3,55 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Lapangan;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class LapanganController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        return Lapangan::all();
+        return Lapangan::latest()->get();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        return Lapangan::create($request->all());
+        $lapangan = Lapangan::create($this->validatedData($request));
+
+        return response()->json($lapangan, 201);
     }
-    /**
-     * Display the specified resource.
-     */
-    public function show($id)
+
+    public function show(Lapangan $lapangan): Lapangan
     {
-        return Lapangan::findOrFail($id);
+        return $lapangan;
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    public function update(Request $request, Lapangan $lapangan): JsonResponse
+    {
+        $lapangan->update($this->validatedData($request));
 
+        return response()->json($lapangan);
+    }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-{
-    Lapangan::destroy($id);
+    public function destroy(Lapangan $lapangan): JsonResponse
+    {
+        $lapangan->delete();
 
-    return response()->json([
-        'message' => 'Data berhasil dihapus'
-    ]);
-}
-    public function update(Request $request, string $id)
-{
-    $lapangan = Lapangan::findOrFail($id);
+        return response()->json([
+            'message' => 'Data berhasil dihapus',
+        ]);
+    }
 
-    $lapangan->update($request->all());
-
-    return response()->json($lapangan);
-}
+    private function validatedData(Request $request): array
+    {
+        return $request->validate([
+            'nama_lapangan' => 'required|string|max:255',
+            'jenis_olahraga' => 'required|string|max:100',
+            'harga_per_jam' => 'required|integer|min:0',
+            'deskripsi' => 'nullable|string',
+            'gambar' => 'nullable|string|max:255',
+            'status' => ['required', Rule::in(['tersedia', 'maintenance'])],
+        ]);
+    }
 }

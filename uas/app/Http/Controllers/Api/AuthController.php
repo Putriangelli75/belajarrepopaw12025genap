@@ -3,50 +3,69 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    //
-    public function register(Request $request)
+    public function register(Request $request): JsonResponse
     {
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password)
-        ]);
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6'
+            'password' => 'required|min:6',
+            'role' => 'required|in:admin,pelanggan',
         ]);
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role' => $validated['role'],
+        ]);
+
         $token = $user->createToken('token')->plainTextToken;
 
         return response()->json([
-            'token' => $token
-        ]);
+            'message' => 'Registrasi berhasil',
+            'token' => $token,
+            'user' => $user,
+        ], 201);
     }
-    public function login(Request $request)
+
+    public function login(Request $request): JsonResponse
     {
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json([
-                'message' => 'Login gagal'
-            ], 401);
-        }
-        $request->validate([
+        $credentials = $request->validate([
             'email' => 'required|email',
-            'password' => 'required'
+            'password' => 'required',
         ]);
+
+        if (! Auth::attempt($credentials)) {
+            throw ValidationException::withMessages([
+                'email' => ['Email atau password tidak sesuai.'],
+            ]);
+        }
 
         $user = Auth::user();
-
         $token = $user->createToken('token')->plainTextToken;
 
         return response()->json([
+            'message' => 'Login berhasil',
             'token' => $token,
-            'user' => $user
+            'user' => $user,
+        ]);
+    }
+
+    public function logout(Request $request): JsonResponse
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'Logout berhasil',
         ]);
     }
 }

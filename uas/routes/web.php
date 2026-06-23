@@ -2,10 +2,19 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'login');
+Route::get('/', function () {
+    return view('home');
+})->name('home');
 
-Route::view('/login', 'login');
-Route::view('/register', 'register');
+Route::view('/login', 'login')->name('login');
+Route::view('/register', 'register')->name('register');
+// Pelanggan (User) routes
+Route::view('/dashboard', 'dashboard')->name('dashboard');
+Route::view('/lapangan', 'lapangan')->name('lapangan.index');
+Route::view('/booking', 'booking')->name('booking.index');
 
-Route::view('/dashboard', 'dashboard');
-Route::view('/lapangan', 'lapangan');
+
+// Admin routes
+Route::view('/admin/dashboard', 'admin.dashboard')->name('admin.dashboard');
+Route::view('/admin/lapangan', 'admin.lapangan')->name('admin.lapangan');
+Route::view('/admin/bookings', 'admin.bookings')->name('admin.bookings');
